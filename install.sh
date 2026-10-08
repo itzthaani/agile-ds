@@ -5,7 +5,7 @@ set -e
 
 # Repository configuration
 REPO_URL="https://github.com/itzthaani/agile-ds/archive/refs/heads/main.tar.gz"
-TARGET_DIR="$HOME/Desktop/agile-ds"
+TARGET_DIR="$HOME/Desktop/Kadagile-DS-Materials"
 
 echo "Downloading agile-ds repository files to Desktop..."
 
