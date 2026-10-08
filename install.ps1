@@ -1,6 +1,8 @@
 $zipUrl = "https://github.com/itzthaani/agile-ds/archive/refs/heads/main.zip"
 $zipPath = "$env:TEMP\agile-ds.zip"
-$extractPath = ".\agile-ds"
+# Points directly to the current user's Desktop folder
+$desktopPath = [Environment]::GetFolderPath("Desktop")
+$extractPath = Join-Path -Path $desktopPath -ChildPath "agile-ds"
 $tempExtractPath = "$env:TEMP\agile-ds-temp"
 
 Write-Host "Downloading agile-ds..." -ForegroundColor Cyan
@@ -17,7 +19,7 @@ if (-not (Test-Path $extractPath)) {
     New-Item -ItemType Directory -Path $extractPath | Out-Null 
 }
 
-# Find the nested 'agile-ds-main' directory and move its contents up
+# Find the nested 'agile-ds-main' directory and move its contents up directly into Desktop\agile-ds
 $nestedFolder = Get-ChildItem -Path $tempExtractPath | Where-Object { $_.PSIsContainer } | Select-Object -First 1
 Get-ChildItem -Path $nestedFolder.FullName | Move-Item -Destination $extractPath -Force
 
