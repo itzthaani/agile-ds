@@ -1,21 +1,21 @@
-$ErrorActionPreference = "Stop"
+$zipUrl = "https://github.com/user/repository/archive/refs/heads/main.zip"
+$zipPath = "$env:TEMP\agile-ds.zip"
+$extractPath = ".\agile-ds"
 
-$desktop = [Environment]::GetFolderPath("Desktop")
-$zipPath = Join-Path $desktop "agile.zip"
-$tempExtract = Join-Path $desktop "agile-temp"
-$targetDir = Join-Path $desktop "agile-ds"
+# 1. Download the zip file
+Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
 
-Write-Host "Downloading agile-ds to Desktop..."
-Invoke-WebRequest -Uri "https://github.com/itzthaani/agile-ds/archive/refs/heads/main.zip" -OutFile $zipPath
+# 2. Extract to a temporary folder to handle nested structure
+$tempExtractPath = "$env:TEMP\agile-ds-temp"
+if (Test-Path $tempExtractPath) { Remove-Item -Path $tempExtractPath -Recurse -Force }
+Expand-Archive -Path $zipPath -DestinationPath $tempExtractPath -Force
 
-Write-Host "Extracting files..."
-Expand-Archive -Path $zipPath -DestinationPath $tempExtract -Force
+# 3. Move contents from the nested folder directly into the target folder
+if (-not (Test-Path $extractPath)) { New-Item -ItemType Directory -Path $extractPath | Out-Null }
 
-New-Item -ItemType Directory -Force -Path $targetDir | Out-Null
-Get-ChildItem -Path "$tempExtract\*" | Move-Item -Destination $targetDir -Force
+$nestedFolder = Get-ChildItem -Path $tempExtractPath | Where-Object { $_.PSIsContainer } | Select-Object -First 1
+Get-ChildItem -Path $nestedFolder.FullName | Move-Item -Destination $extractPath -Force
 
-# Cleanup temp files and script references
-Remove-Item $zipPath, $tempExtract -Recurse -Force
-Remove-Item (Join-Path $targetDir "install.sh"), (Join-Path $targetDir "install.ps1") -ErrorAction SilentlyContinue
-
-Write-Host "Done! Extracted to $targetDir"
+# 4. Cleanup temporary files
+Remove-Item -Path $zipPath -Force
+Remove-Item -Path $tempExtractPath -Recurse -Force
