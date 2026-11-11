@@ -22,10 +22,13 @@ if (-not (Test-Path $extractPath)) {
 # Find the nested 'agile-ds-main' directory
 $nestedFolder = Get-ChildItem -Path $tempExtractPath | Where-Object { $_.PSIsContainer } | Select-Object -First 1
 
-# Remove install.ps1 from extracted files before moving
-$installerPath = Join-Path -Path $nestedFolder.FullName -ChildPath "install.ps1", "README.md"
-if (Test-Path $installerPath) {
-    Remove-Item -Path $installerPath -Force
+# Exclude specific files before moving
+$filesToRemove = @("install.ps1", "README.md")
+foreach ($file in $filesToRemove) {
+    $filePath = Join-Path -Path $nestedFolder.FullName -ChildPath $file
+    if (Test-Path $filePath) {
+        Remove-Item -Path $filePath -Force
+    }
 }
 
 # Move remaining contents directly into Desktop\agile-ds
@@ -35,4 +38,4 @@ Get-ChildItem -Path $nestedFolder.FullName | Move-Item -Destination $extractPath
 Remove-Item -Path $zipPath -Force
 Remove-Item -Path $tempExtractPath -Recurse -Force
 
-Write-Host "Successfully installed to $extractPath" -ForegroundColor Green
+Write-Host "Successfully downloaded to $extractPath" -ForegroundColor Green
