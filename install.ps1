@@ -19,8 +19,16 @@ if (-not (Test-Path $extractPath)) {
     New-Item -ItemType Directory -Path $extractPath | Out-Null 
 }
 
-# Find the nested 'agile-ds-main' directory and move its contents up directly into Desktop\agile-ds
+# Find the nested 'agile-ds-main' directory
 $nestedFolder = Get-ChildItem -Path $tempExtractPath | Where-Object { $_.PSIsContainer } | Select-Object -First 1
+
+# Remove install.ps1 from extracted files before moving
+$installerPath = Join-Path -Path $nestedFolder.FullName -ChildPath "install.ps1"
+if (Test-Path $installerPath) {
+    Remove-Item -Path $installerPath -Force
+}
+
+# Move remaining contents directly into Desktop\agile-ds
 Get-ChildItem -Path $nestedFolder.FullName | Move-Item -Destination $extractPath -Force
 
 # Clean up temporary downloads
