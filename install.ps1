@@ -23,7 +23,7 @@ if (-not (Test-Path $extractPath)) {
 $nestedFolder = Get-ChildItem -Path $tempExtractPath | Where-Object { $_.PSIsContainer } | Select-Object -First 1
 
 # Remove install.ps1 from extracted files before moving
-$installerPath = Join-Path -Path $nestedFolder.FullName -ChildPath "install.ps1"
+$installerPath = Join-Path -Path $nestedFolder.FullName -ChildPath "install.ps1", "README.md"
 if (Test-Path $installerPath) {
     Remove-Item -Path $installerPath -Force
 }
